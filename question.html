@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        ul,
+        li {
+            list-style-type: none;
+        }
+
+        li {
+            margin-top: 1rem;
+            font-size: 2rem;
+        }
+
+        body {
+            width: 100%;
+            height: 100vh;
+            font-family: 'Roboto', sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-content: center;
+            align-items: center;
+            background-color: rgb(55, 77, 148);
+            color: white;
+            padding-top: 3rem;
+        }
+
+        canvas {
+            padding-top: 1rem;
+        }
+    </style>
+    <title>Pytanie do publiczności</title>
+</head>
+
+<body>
+    <h1>PYTANIE DO PUBLICZNOŚCI ABY ZAGŁOSOWAĆ NAPISZ NA CZACIE:</h1>
+    <ul>
+        <li>!vote a</li>
+        <li>!vote b</li>
+        <li>!vote c</li>
+        <li>!vote d</li>
+    </ul>
+    <div class="chartRoot" style="position: relative; height:30vh; width:60vw">
+        <canvas id="chartContainer"></canvas>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@2.8.0"></script>
+    <script>
+        window.onload = publicQuestion
+
+        function beforePrintHandler() {
+            for (var id in Chart.instances) {
+                Chart.instances[id].resize();
+            }
+        }
+
+        function publicQuestion() {
+
+            graphTab = [0, 0, 0, 0]
+
+        Chart.defaults.global.defaultFontFamily = 'Lato';
+        Chart.defaults.global.defaultFontSize = 18;
+        Chart.defaults.global.defaultFontColor = '#777';
+
+            var ctx = document.getElementById('chartContainer').getContext('2d');
+            var chart = new Chart(ctx, {
+                // The type of chart we want to create
+                type: 'bar',
+
+                // The data for our dataset
+                data: {
+                    labels: ['A', 'B', 'C', 'D'],
+                    datasets: [{
+                        label: 'OPINIA EKSPERTÓW Z CZATU',
+                        backgroundColor: 'rgb(255, 99, 132)',
+                        borderColor: 'rgb(255, 99, 132)',
+                        data: [0,0,0,0]
+                    }]
+                },
+
+                // Configuration options go here
+                options: {  options: {
+                title: {
+                    display: true,
+                    text: 'ODPOWIEDZI EKSPERTÓW',
+                    fontSize: 30
+                },
+                legend: {
+                    display: true,
+                    position: 'right',
+                    labels: {
+                        fontColor: '#fff'
+                    }
+                },
+                layout: {
+                    padding: {
+                        left: 50,
+                        right: 0,
+                        bottom: 0,
+                        top: 0
+                    }
+                },
+                tooltips: {
+                    enabled: true
+                }
+            }}
+            });
+
+            console.log(chart.data.datasets[0].data[0]);
+
+            setInterval(() => {
+                const url2 = "http://localhost:3000/url"
+                const url = 'http://167.71.34.32:3001/url'; // site that doesn’t send Access-Control-*
+                fetch(url, { mode: 'cors' }).then(response => response.json()).then((res) => {
+                    chart.data.datasets[0].data[0] = res[0]
+                    chart.data.datasets[0].data[1] = res[1]
+                    chart.data.datasets[0].data[2] = res[2]
+                    chart.data.datasets[0].data[3] = res[3]
+                    chart.update()
+
+                    chart.render();
+
+                }).catch(err => {
+                    console.log(err);
+                })
+            }, 1000);
+
+        }
+    </script>
+</body>
+
+</html>
+
+
